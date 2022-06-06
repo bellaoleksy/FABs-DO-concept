@@ -31,6 +31,36 @@ sky_buoy <- read.table(here("data/sky_2016_tempProfile.txt"), sep=",", header=TR
 #sky_2016_sensorTemp_6.5m.txt is the temperature only at 6.5m; MiniDOT
 #sky_2016_sensorTemp.txt is the temperature only at 0.5m; MiniDOT
 
+# Sky buoy DO
+sky_DO_0.5 <- read.table(here("data/sky_2016_DO_0.5m.txt"), sep=",", header=TRUE) %>%
+  mutate(dateTime = ymd_hms(dateTime),
+         depth = 0.5,
+         lakeID = "SkyPond") %>%
+  filter(dateTime < "2016-10-30")
+sky_DO_6.5 <- read.table(here("data/sky_2016_DO_6.5m.txt"), sep=",", header=TRUE) %>%
+  mutate(dateTime = ymd_hms(dateTime),
+         depth = 6.5,
+         lakeID = "SkyPond") %>%
+  filter(dateTime < "2016-10-30")
+
+
+# Loch buoy DO
+loch_DO_0.5 <- read.table(here("data/loch_2016_DO_0.5m.txt"), sep=",", header=TRUE) %>%
+  mutate(dateTime = ymd_hms(dateTime),
+         depth = 0.5,
+         lakeID = "TheLoch") 
+loch_DO_4.5 <- read.table(here("data/loch_2016_DO_4.5m.txt"), sep=",", header=TRUE) %>%
+  mutate(dateTime = ymd_hms(dateTime),
+         depth = 4.5,
+         lakeID = "TheLoch") 
+
+#Combine all DO data
+DO_master <- bind_rows(sky_DO_0.5,
+                       sky_DO_6.5,
+                       loch_DO_0.5,
+                       loch_DO_4.5)
+
+
 # Loch littoral sites
 LB3<-read_csv(here("data/LB3_2016.csv")) %>%
   mutate(dateTime=mdy_hm(dateTime))
@@ -44,7 +74,9 @@ LI<-read_csv(here("data/LochInlet_2016.csv")) %>%
   mutate(dateTime=mdy_hm(dateTime))
 
 
-# Water column heat map
+# Data vis Sky Buoy Temp ----------------------------------------------------------------
+
+
 
 # We only have > 2 depths for temperature through 2016-08-04
 sky_buoy_trim <- sky_buoy %>%
@@ -95,7 +127,26 @@ sky_buoy %>%
   scale_color_viridis(discrete=TRUE)+
   theme(panel.background = element_rect(fill="black"))
 
-# Data vis littoral ----------------------------------------------------------------
+
+# Data vis Loch and Sky buoy DO ----------------------------------------------------------------
+
+
+
+#preview raw data
+DO_master %>%
+  mutate(
+    location = case_when(
+      depth == 0.5 ~ "surface",
+      TRUE ~ "bottom"
+    )
+  ) %>%
+  ggplot(aes(x=dateTime,y=DO,color=location,shape=lakeID,linetype=lakeID))+
+  geom_point(alpha=0.5,size=0.2)+
+  geom_line(alpha=0.5)+
+  theme_few()+
+  facet_wrap(lakeID~., ncol=2)
+
+# Data vis Loch and Sky littoral ----------------------------------------------------------------
 
 
 
@@ -135,4 +186,5 @@ bind_rows(SB1,SB2,SB3,SB4,SB5,
   geom_histogram(alpha=0.5, position="identity", bins=10)+
   scale_fill_viridis(discrete=TRUE)+
   facet_wrap(siteID~lakeID, nrow=2, ncol=5, scales="free_x")
+
 
