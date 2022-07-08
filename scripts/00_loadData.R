@@ -8,31 +8,31 @@ if(!require(viridis)){install.packages("viridis")};library(viridis)
 if(!require(rLakeAnalyzer)){install.packages("rLakeAnalyzer")};library(rLakeAnalyzer)
 source(here("scripts/00_helperFunctions.R"))
 
-#' # Read in data from Sky Pond (alpine) and The Loch (subalpine)
+#' #  Read in data from Sky Pond (alpine) and The Loch (subalpine)
 #' Sky littoral sites
 #+ warning = FALSE, message = FALSE
-SB1 <- read_csv(here("data/SB1_2016.csv")) %>%
+SB1 <- read_csv(here("data/sky/littoral/SB1_2016.csv")) %>%
   mutate(dateTime = mdy_hm(dateTime))
-SB2 <- read_csv(here("data/SB2_2016.csv")) %>%
+SB2 <- read_csv(here("data/sky/littoral/SB2_2016.csv")) %>%
   mutate(dateTime = mdy_hm(dateTime))
-SB3 <- read_csv(here("data/SB3_2016.csv")) %>%
+SB3 <- read_csv(here("data/sky/littoral/SB3_2016.csv")) %>%
   mutate(dateTime = mdy_hm(dateTime))
-SB4 <- read_csv(here("data/SB4_2016.csv")) %>%
+SB4 <- read_csv(here("data/sky/littoral/SB4_2016.csv")) %>%
   mutate(dateTime = mdy_hm(dateTime))
-SB5 <- read_csv(here("data/SB5_2016.csv")) %>%
+SB5 <- read_csv(here("data/sky/littoral/SB5_2016.csv")) %>%
   mutate(dateTime = mdy_hm(dateTime))
 
 #' Loch littoral sites
 #+ warning = FALSE, message = FALSE
-LB1 <- read_csv(here("data/LochInlet_2016.csv")) %>%
+LB1 <- read_csv(here("data/loch/littoral/LochInlet_2016.csv")) %>%
   mutate(dateTime = mdy_hm(dateTime))
-LB3 <- read_csv(here("data/LB3_2016.csv")) %>%
+LB3 <- read_csv(here("data/loch/littoral/LB3_2016.csv")) %>%
   mutate(dateTime = mdy_hm(dateTime))
-LB4 <- read_csv(here("data/LB4_2016.csv")) %>%
+LB4 <- read_csv(here("data/loch/littoral/LB4_2016.csv")) %>%
   mutate(dateTime = mdy_hm(dateTime))
-LB5 <- read_csv(here("data/LB5_2016.csv")) %>%
+LB5 <- read_csv(here("data/loch/littoral/LB5_2016.csv")) %>%
   mutate(dateTime = mdy_hm(dateTime))
-LB6 <- read_csv(here("data/LB6_2016.csv")) %>%
+LB6 <- read_csv(here("data/loch/littoral/LB6_2016.csv")) %>%
   mutate(dateTime = mdy_hm(dateTime))
 
 #' Master littoral
@@ -48,10 +48,10 @@ littoral_master <- bind_rows(sky_littoral,
 
 
 
-#' Sky buoy temperature
+#' # Sky buoy temperature
 #+ warning = FALSE, message = FALSE
 sky_buoy_long <-
-  read.table(here("data/sky_2016_tempProfile.txt"),
+  read.table(here("data/sky/pelagic/sky_2016_tempProfile.txt"),
              sep = ",",
              header = TRUE) %>%
   mutate(
@@ -76,10 +76,10 @@ sky_buoy_long <-
 #' + sky_2016_sensorTemp.txt is the temperature only at 0.5m; MiniDOT
 
 
-#' Loch buoy temperature
+#' # Loch buoy temperature
 #+ warning = FALSE, message = FALSE
 
-loch_buoy_long <- read.table(here("data/loch_2016_tempProfile.txt"), sep=",", header=TRUE) %>%
+loch_buoy_long <- read.table(here("data/loch/pelagic/loch_2016_tempProfile.txt"), sep=",", header=TRUE) %>%
   mutate(dateTime = ymd_hms(as.factor(dateTime)),
          dateTime = force_tz(dateTime, tz="America/Denver"),
          dateTime = with_tz(dateTime, "GMT")) %>%
@@ -95,10 +95,10 @@ loch_buoy_long <- read.table(here("data/loch_2016_tempProfile.txt"), sep=",", he
 #' + loch_2016_sensorTemp_0.5m.txt is the temperature only at 0.5m; MiniDOT
 
 
-#' Sky buoy DO
+#' # Sky buoy DO
 #+ warning = FALSE, message = FALSE
 sky_DO_0.5 <-
-  read.table(here("data/sky_2016_DO_0.5m.txt"),
+  read.table(here("data/sky/pelagic/sky_2016_DO_0.5m.txt"),
              sep = ",",
              header = TRUE) %>%
   mutate(
@@ -110,7 +110,7 @@ sky_DO_0.5 <-
   filter(dateTime < "2016-11-02")
 
 sky_DO_6.5 <-
-  read.table(here("data/sky_2016_DO_6.5m.txt"),
+  read.table(here("data/sky/pelagic/sky_2016_DO_6.5m.txt"),
              sep = ",",
              header = TRUE) %>%
   mutate(
@@ -122,11 +122,11 @@ sky_DO_6.5 <-
   filter(dateTime < "2016-11-02")
 
 
-#' Loch buoy DO
+#' # Loch buoy DO
 #+ warning = FALSE, message = FALSE
 
 loch_DO_0.5 <-
-  read.table(here("data/loch_2016_DO_0.5m.txt"),
+  read.table(here("data/loch/pelagic/loch_2016_DO_0.5m.txt"),
              sep = ",",
              header = TRUE) %>%
   mutate(
@@ -136,7 +136,7 @@ loch_DO_0.5 <-
     habitat = "pelagic"
   )
 loch_DO_4.5 <-
-  read.table(here("data/loch_2016_DO_4.5m.txt"),
+  read.table(here("data/loch/pelagic/loch_2016_DO_4.5m.txt"),
              sep = ",",
              header = TRUE) %>%
   mutate(
@@ -171,6 +171,13 @@ buoy_master <-
                     levels = c("summer", "fall"))
   ) 
 
+#' Meterological data
+wx <- read_csv(here("data/WY2016to2022_LochVale_WX.csv")) %>%
+  mutate(dateTime = mdy_hm(dateTime))
+
+#' Chlorophyll data
+chl <- read_csv(here("data/AllPelagicCHLA_2016-2021.csv")) %>%
+  mutate(date= mdy(date))
 
 #' # Data vis: D.O. from buoys ----------------------------------------------------------------
 
@@ -310,7 +317,8 @@ bind_rows(SB1,SB2,SB3,SB4,SB5,
 
 
 #' How do the littoral zone temperatures compared to 0.5m temperatures?
-# Separate panel for each site
+#' Separate panel for each site
+#+ fig.height=10, fig.width=15, echo=FALSE, warning=FALSE, message=FALSE
 bind_rows(SB1,SB2,SB3,SB4,SB5,
           LB3,LB4,LB5,LB6,LB1)%>%
   select(lakeID, siteID, dateTime, temp_C) %>%
@@ -333,7 +341,8 @@ bind_rows(SB1,SB2,SB3,SB4,SB5,
   theme(legend.position="none")
 
 #' How do the littoral zone temperatures compared to 0.5m temperatures?
-# Include 0.5m depth in the background of each panel
+#' Include 0.5m depth in the background of each panel
+#+ fig.height=10, fig.width=15, echo=FALSE, warning=FALSE, message=FALSE
 surface_temps<- loch_buoy_long %>%
             filter(parameter=="temperature" & depth=="0.5") %>%
             rename(surface_temp_C=value,
@@ -372,15 +381,8 @@ ggsave("figures/Littoral_and_pelagic_temperature_2016_raw.png", width=15, height
 
 
 #' How do the littoral zone diel fluctuations compare to 0.5m temperatures?
-# Include 0.5m depth in the background of each panel
-
-what<- surface_temps %>%
-  group_by(lakeID,date)%>%
-  summarize(min_T=min(surface_temp_C, na.rm=TRUE),
-            max_T=max(surface_temp_C, na.rm=TRUE),
-            diff_T_surface=max_T-min_T) %>%
-  select(-c(min_T, max_T))
-
+#' Include 0.5m depth in the background of each panel
+#+ fig.height=10, fig.width=15, echo=FALSE, warning=FALSE, message=FALSE
   bind_rows(SB1,SB2,SB3,SB4,SB5,
             LB3,LB4,LB5,LB6,LB1)%>%
   mutate(siteID=recode(siteID, SB3 = "SB3 (inlet, rock glacier)", LB1 = "LB1 (inlet, stream)")) %>%
@@ -413,3 +415,57 @@ what<- surface_temps %>%
        x="Date")
 
 ggsave("figures/Littoral_and_pelagic_temperature_2016_diel.png", width=15, height=9,units="in", dpi=300)
+
+#' # Chlorophyll data
+#' Not entirely sure why there is a gap in 2017 since I know I was collecting data during this time (IAO)
+#+ fig.height=10, fig.width=15, echo=FALSE, warning=FALSE, message=FALSE
+chl %>%
+  mutate(year=year(date)) %>%
+  filter(sampleType %in% c("Pelagic","Epilimnion","Hypolimnion")) %>%
+  ggplot(aes(x=date, y=chla_ugL, color=lakeID, shape=sampleType))+
+  geom_point()+
+  facet_wrap(lakeID~year, scales="free", ncol=6)
+
+
+#' # Met data
+#' How do the various meterological variables vary by year? 
+#' ## Year-round ata
+#+ fig.height=10, fig.width=15, echo=FALSE, warning=FALSE, message=FALSE
+wx %>%
+  pivot_longer(T_air:LWout) %>%
+  mutate(year=year(dateTime),
+         doy=yday(dateTime)) %>%
+  filter(year>2015 & year <2022) %>% #look at complete years only 
+  filter(!name %in% c("LWin","LWout","SWin","SWout")) %>% #only show variables with data across all years
+  # filter(doy > 121 & doy < 273) %>% #let's just look at May-Sept inclusive
+  group_by(name) %>%
+  mutate(scaled_value=scale(value)) %>%
+  ggplot(aes(y=scaled_value, x=factor(year), color=factor(year))) +
+  geom_violin() +
+  geom_boxplot(width=0.2) +
+  facet_wrap(name~., scales="free_y") +
+  scale_color_viridis(discrete=TRUE) +
+  labs(x="Year",
+       y="Scaled value (z-score)") +
+  theme(legend.position="none")
+ggsave("figures/LochVale_wx_summary_2016-2021.png", width=15, height=9,units="in", dpi=300)
+
+
+#' ## Generally open-water season (June-Aug inclusive)
+wx %>%
+  pivot_longer(T_air:LWout) %>%
+  mutate(year=year(dateTime),
+         doy=yday(dateTime)) %>%
+  filter(year>2015 & year <2022) %>% #look at complete years only 
+  filter(!name %in% c("LWin","LWout","SWin","SWout")) %>% #only show variables with data across all years
+  filter(doy > 152 & doy < 243) %>% #let's just look at June-Aug inclusive
+  group_by(name) %>%
+  mutate(scaled_value=scale(value)) %>%
+  ggplot(aes(y=scaled_value, x=factor(year), color=factor(year))) +
+  geom_violin() +
+  geom_boxplot(width=0.2) +
+  facet_wrap(name~., scales="free_y") +
+  scale_color_viridis(discrete=TRUE) +
+  labs(x="Year",
+       y="Scaled value (z-score)") +
+  theme(legend.position="none")
