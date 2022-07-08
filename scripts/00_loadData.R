@@ -373,6 +373,14 @@ ggsave("figures/Littoral_and_pelagic_temperature_2016_raw.png", width=15, height
 
 #' How do the littoral zone diel fluctuations compare to 0.5m temperatures?
 # Include 0.5m depth in the background of each panel
+
+what<- surface_temps %>%
+  group_by(lakeID,date)%>%
+  summarize(min_T=min(surface_temp_C, na.rm=TRUE),
+            max_T=max(surface_temp_C, na.rm=TRUE),
+            diff_T_surface=max_T-min_T) %>%
+  select(-c(min_T, max_T))
+
   bind_rows(SB1,SB2,SB3,SB4,SB5,
             LB3,LB4,LB5,LB6,LB1)%>%
   mutate(siteID=recode(siteID, SB3 = "SB3 (inlet, rock glacier)", LB1 = "LB1 (inlet, stream)")) %>%
@@ -388,7 +396,8 @@ ggsave("figures/Littoral_and_pelagic_temperature_2016_raw.png", width=15, height
               summarize(min_T=min(surface_temp_C, na.rm=TRUE),
                         max_T=max(surface_temp_C, na.rm=TRUE),
                         diff_T_surface=max_T-min_T) %>%
-              select(-c(min_T, max_T)), by=c("lakeID","date")) %>%
+              select(-c(min_T, max_T)) %>%
+              mutate(diff_T_surface = na_if(diff_T_surface, -Inf)), by=c("lakeID","date")) %>%
   select(lakeID, siteID, date, diff_T, diff_T_surface) %>%
   ggplot(aes(linetype=lakeID))+
   geom_point(aes(x=date,y=diff_T_surface, group=lakeID), color="grey80", alpha=0.7)+
