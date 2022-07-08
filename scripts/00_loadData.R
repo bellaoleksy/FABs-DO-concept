@@ -349,6 +349,7 @@ surface_temps<- loch_buoy_long %>%
 
 bind_rows(SB1,SB2,SB3,SB4,SB5,
           LB3,LB4,LB5,LB6,LB1)%>%
+  mutate(siteID=recode(siteID, SB3 = "SB3 (inlet, rock glacier)", LB1 = "LB1 (inlet, stream)")) %>%
   mutate(date=date(dateTime),
          dateTime=round_date(dateTime, "hour"))%>% #so they play nice 
   left_join(., surface_temps, by=c("lakeID","date","dateTime")) %>%
@@ -360,5 +361,46 @@ bind_rows(SB1,SB2,SB3,SB4,SB5,
   geom_line(aes(x=dateTime,y=temp_C,color=siteID,shape=lakeID), alpha=0.2)+
   facet_wrap(lakeID~siteID, ncol=5, nrow=2)+
   scale_color_viridis(discrete=TRUE)+
-  theme(legend.position="none")
+  theme(legend.position="none")+
+  labs(title="Loch and Sky Pond 2016 - raw data",
+       subtitle="Panels are individual littoral zone sites while grey points on each panel are pelagic temperature measurements at 0.5m",
+       y="Temperature (deg C)",
+       x="Date")
 
+ggsave("figures/Littoral_and_pelagic_temperature_2016_raw.png", width=15, height=9,units="in", dpi=300)
+
+
+
+#' How do the littoral zone diel fluctuations compare to 0.5m temperatures?
+# Include 0.5m depth in the background of each panel
+  bind_rows(SB1,SB2,SB3,SB4,SB5,
+            LB3,LB4,LB5,LB6,LB1)%>%
+  mutate(siteID=recode(siteID, SB3 = "SB3 (inlet, rock glacier)", LB1 = "LB1 (inlet, stream)")) %>%
+  mutate(date=date(dateTime),
+         dateTime=round_date(dateTime, "hour"))%>% #so they play nice 
+  group_by(lakeID, siteID, date) %>%
+  summarize(min_T=min(temp_C, na.rm=TRUE),
+              max_T=max(temp_C, na.rm=TRUE),
+              diff_T=max_T-min_T) %>%
+  select(-c(min_T, max_T)) %>%
+  left_join(., surface_temps %>%
+              group_by(lakeID,date)%>%
+              summarize(min_T=min(surface_temp_C, na.rm=TRUE),
+                        max_T=max(surface_temp_C, na.rm=TRUE),
+                        diff_T_surface=max_T-min_T) %>%
+              select(-c(min_T, max_T)), by=c("lakeID","date")) %>%
+  select(lakeID, siteID, date, diff_T, diff_T_surface) %>%
+  ggplot(aes(linetype=lakeID))+
+  geom_point(aes(x=date,y=diff_T_surface, group=lakeID), color="grey80", alpha=0.7)+
+  geom_line(aes(x=date, y=diff_T_surface, group=lakeID), color="grey50", alpha=0.7)+
+  geom_point(aes(x=date,y=diff_T,color=siteID,shape=lakeID), alpha=0.2)+
+  geom_line(aes(x=date,y=diff_T,color=siteID,shape=lakeID), alpha=0.2)+
+  facet_wrap(lakeID~siteID, ncol=5, nrow=2)+
+  scale_color_viridis(discrete=TRUE)+
+  theme(legend.position="none")+
+  labs(title="Loch and Sky Pond 2016 - diel fluctuations",
+       subtitle="Panels are individual littoral zone sites while grey points on each panel are pelagic temperature measurements at 0.5m",
+       y="MaximumT - MinimumT (deg C)",
+       x="Date")
+
+ggsave("figures/Littoral_and_pelagic_temperature_2016_diel.png", width=15, height=9,units="in", dpi=300)
