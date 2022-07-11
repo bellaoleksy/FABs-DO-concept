@@ -3,6 +3,6 @@
 .RData
 .Ruserdata
 .DS_Store
-*/data/archive
-*/data/loch/pelagic/old
-*/data/sky/pelagic/old
+/data/archive
+/data/loch/pelagic/old
+/data/sky/pelagic/old
