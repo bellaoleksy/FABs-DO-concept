@@ -1,3 +1,7 @@
+### This is a script that pulls individual .tif bathymetry files from https://www.nature.com/articles/s41597-022-01132-9
+### and calculates the area of the lake with depths "LESS THAN" 4 meters. A proxy for littoral area. 
+
+
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(tidyverse, sf, stars, units, utils, parallel)
 
