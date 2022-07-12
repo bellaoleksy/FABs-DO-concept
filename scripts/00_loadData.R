@@ -190,7 +190,11 @@ sky_buoy_long %>%
   geom_point(alpha=0.2)+
   facet_wrap(parameter~., nrow=2, scales="free_y")+
   scale_x_datetime(date_breaks = "2 months",
-               date_minor_breaks = "4 weeks")
+               date_minor_breaks = "4 weeks")+
+  labs(title="Sky Pond")
+ggsave("figures/SkyPond_temp_DO_2016-2018.png", width=15, height=9,units="in", dpi=300)
+
+
 #' Some kind of crazy dynamics going on around ice-off.
 #' Interesting that winter 2016-2017 the lake pretty distinctly reverse stratifes, but not in 2017-2018
 #' in 2017, The Loch (subalpine lakes ~200m lower in elevation) had ice-off by 5/16. 
@@ -230,7 +234,10 @@ loch_buoy_long %>%
   geom_point(alpha=0.2)+
   facet_wrap(parameter~., nrow=2, scales="free_y")+
   scale_x_datetime(date_breaks = "2 months",
-                   date_minor_breaks = "4 weeks")
+                   date_minor_breaks = "4 weeks")+
+  labs(title="The Loch")
+ggsave("figures/TheLoch_temp_DO_2016-2018.png", width=15, height=9,units="in", dpi=300)
+
 
 #' Also some kind of crazy dynamics going on around ice-off.
 #' in 2017, The Loch  had ice-off by 5/16. 
