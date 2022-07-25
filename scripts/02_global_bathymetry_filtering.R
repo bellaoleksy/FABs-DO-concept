@@ -5,13 +5,32 @@
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(tidyverse, sf, stars, units, utils, parallel)
 
-bathy_file <- list.files(path = "/Volumes/SeagateBackupPlusDrive/GLOBAL_BATHYMETRY")
+high_lakes_str <- read.csv("./data/high_elevation_hylak_hybas_names.csv") %>%
+  select(hylak_id)
+
+high_lakes_dat <- read.csv("./data/high_elevation_hylak_hybas_names.csv") %>%
+  select(hylak_id,centr_lat,centr_lon)
+
+high_elevation_lake_names = c(paste0(high_lakes_str$hylak_id,"_bathymetry.tif"))
+
+bathy_file <- sapply(high_elevation_lake_names, function(x){list.files(path = "/Volumes/SeagateBackupPlusDrive/GLOBAL_BATHYMETRY",pattern = x)})
+
+
+
+bathy_file <- list.files(path = "/Volumes/SeagateBackupPlusDrive/GLOBAL_BATHYMETRY",
+                         pattern = c(high_elevation_lake_names))
+
+sapply(high_lakes_str, function(x)list.files(path = "/Volumes/SeagateBackupPlusDrive/GLOBAL_BATHYMETRY", 
+                                   pattern=high_lakes_str, 
+                                   recursive=F,
+                                   full.names=F))
 
 extract_littoral <- function(bathy_file){
 
-    stars::read_stars(paste0("/Volumes/SeagateBackupPlusDrive/GLOBAL_BATHYMETRY/",bathy_file,"")) %>%
+    stars::read_stars(paste0("/Volumes/SeagateBackupPlusDrive/Bathymetry_Rasters/",bathy_file[1],""), recursive = T) %>%
       sf::st_as_sf(.) %>% 
       dplyr::rename(depth_m = paste0(bathy_file)) %>%
+      dplyr::mutate(max_depth_m = max(depth_m, na.rm = T)) %>%
       dplyr::mutate(mean_depth_m = mean(depth_m, na.rm = T)) %>%
       dplyr::filter(depth_m <= 4) %>%
       dplyr::rename(mean_littoral_depth_m = depth_m) %>%
@@ -29,7 +48,7 @@ extract_littoral <- function(bathy_file){
   }
   
   
-n.cores <- detectCores()-2
+n.cores <- detectCores()-1
 
 cl <- makeCluster(n.cores)
 
